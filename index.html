@@ -1,55 +1,64 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Harga Emas Pluang</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Harga Emas Hari Ini</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     body {
       font-family: sans-serif;
-      padding: 15px;
-      background-color: #fff8e1;
+      background-color: #fffbea;
       color: #333;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
     }
     .widget {
-      border: 2px solid #ffd54f;
-      border-radius: 10px;
-      padding: 15px;
-      max-width: 300px;
-      margin: auto;
       text-align: center;
+      border: 2px solid gold;
+      border-radius: 15px;
+      padding: 20px;
+      background-color: #fff9c4;
+      max-width: 300px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
     }
     .harga {
-      font-size: 24px;
+      font-size: 28px;
       font-weight: bold;
-      margin-top: 10px;
+      margin: 15px 0;
+    }
+    .update {
+      font-size: 12px;
+      color: #666;
     }
   </style>
 </head>
 <body>
   <div class="widget">
-    <h2>Harga Emas Pluang</h2>
-    <div class="harga" id="hargaEmas">Memuat...</div>
-    <p style="font-size:12px">Update otomatis tiap 5 menit</p>
+    <h2>Harga Emas Hari Ini</h2>
+    <div class="harga" id="harga">Memuat...</div>
+    <div class="update" id="updateTime">—</div>
   </div>
 
   <script>
-    async function ambilHargaPluang() {
+    async function ambilHarga() {
       try {
-        const res = await fetch("https://pluang.com/id/emas");
-        const text = await res.text();
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(text, "text/html");
-        const span = doc.querySelector("span[data-testid='live-price']");
-        const harga = span ? span.textContent.replace("Rp", "").trim() : "Tidak tersedia";
-        document.getElementById("hargaEmas").textContent = "Rp " + harga;
-      } catch (e) {
-        document.getElementById("hargaEmas").textContent = "Gagal memuat";
-        console.error("Gagal ambil harga emas:", e);
+        const res = await fetch('https://emas.id/api/harga_emas_murni');
+        const data = await res.json();
+        const harga = data?.harga?.toLocaleString('id-ID');
+        const waktu = new Date().toLocaleString('id-ID');
+        document.getElementById("harga").textContent = "Rp " + harga + " / gram";
+        document.getElementById("updateTime").textContent = "Update: " + waktu;
+      } catch (error) {
+        document.getElementById("harga").textContent = "Gagal memuat";
+        document.getElementById("updateTime").textContent = "";
+        console.error("Error ambil harga:", error);
       }
     }
 
-    ambilHargaPluang();
-    setInterval(ambilHargaPluang, 5 * 60 * 1000);
+    ambilHarga();
+    setInterval(ambilHarga, 5 * 60 * 1000); // perbarui tiap 5 menit
   </script>
 </body>
 </html>
