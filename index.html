@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Harga Emas Pluang</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 15px;
+      background-color: #fff8e1;
+      color: #333;
+    }
+    .widget {
+      border: 2px solid #ffd54f;
+      border-radius: 10px;
+      padding: 15px;
+      max-width: 300px;
+      margin: auto;
+      text-align: center;
+    }
+    .harga {
+      font-size: 24px;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="widget">
+    <h2>Harga Emas Pluang</h2>
+    <div class="harga" id="hargaEmas">Memuat...</div>
+    <p style="font-size:12px">Update otomatis tiap 5 menit</p>
+  </div>
+
+  <script>
+    async function ambilHargaPluang() {
+      try {
+        const res = await fetch("https://pluang.com/id/emas");
+        const text = await res.text();
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(text, "text/html");
+        const span = doc.querySelector("span[data-testid='live-price']");
+        const harga = span ? span.textContent.replace("Rp", "").trim() : "Tidak tersedia";
+        document.getElementById("hargaEmas").textContent = "Rp " + harga;
+      } catch (e) {
+        document.getElementById("hargaEmas").textContent = "Gagal memuat";
+        console.error("Gagal ambil harga emas:", e);
+      }
+    }
+
+    ambilHargaPluang();
+    setInterval(ambilHargaPluang, 5 * 60 * 1000);
+  </script>
+</body>
+</html>
